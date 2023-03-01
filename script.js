@@ -5,6 +5,8 @@ window.addEventListener('load', function () {
   canvas.height = 720;
 
   ctx.fillStyle = 'white';
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = 'white';
 
   class Player {
     constructor(game) {
@@ -17,7 +19,11 @@ window.addEventListener('load', function () {
       context.beginPath(); // to draw circle canvas
       // built-in "arc" method which expects 5 args(X and Y coordinates, RADIUS of circle, START and END angle in radians)
       context.arc(this.collisionX, this.collisionY, this.collisionRadius, 0, Math.PI * 2);
+      context.save();
+      context.globalAlpha = 0.5;
       context.fill();
+      context.restore();
+      context.stroke();
     }
   }
 
