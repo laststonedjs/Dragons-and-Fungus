@@ -60,9 +60,18 @@ window.addEventListener('load', function () {
       this.game = game;
       this.collisionX = Math.random() * this.game.width;
       this.collisionY = Math.random() * this.game.height;
-      this.collisionRadius = 100;
+      this.collisionRadius = 50;
+      this.image = document.getElementById('obstacles');
+      this.spriteWidth = 250;
+      this.spriteHeight = 250;
+      this.width = this.spriteWidth;
+      this.height = this.spriteHeight;
+      this.spriteX = this.collisionX - this.width * 0.5;
+      this.spriteY = this.collisionY - this.height * 0.5 - 80;
     }
     draw(context) {
+      context.drawImage(this.image, 0, 0, this.spriteWidth,
+        this.spriteHeight, this.spriteX, this.spriteY, this.width, this.height);
       // to draw circle canvas
       context.beginPath();
       /**
