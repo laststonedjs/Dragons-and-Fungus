@@ -55,12 +55,38 @@ window.addEventListener('load', function () {
     }
   }
 
+  class Obstacle {
+    constructor(game) {
+      this.game = game;
+      this.collisionX = Math.random() * this.game.width;
+      this.collisionY = Math.random() * this.game.height;
+      this.collisionRadius = 100;
+    }
+    draw(context) {
+      // to draw circle canvas
+      context.beginPath();
+      /**
+       * built-in "arc" method which expects 5 args
+       * (X and Y coordinates, RADIUS of circle, START and END angle in radians)
+       */
+      context.arc(this.collisionX, this.collisionY, this.collisionRadius, 0, Math.PI * 2);
+
+      context.save();
+      context.globalAlpha = 0.5;
+      context.fill();
+      context.restore();
+      context.stroke();
+    }
+  }
+
   class Game {
     constructor(canvas) {
       this.canvas = canvas;
       this.width = this.canvas.width;
       this.height = this.canvas.height;
       this.player = new Player(this);
+      this.numberOfObstacles = 5;
+      this.obstacles = [];
       this.mouse = {
         x: this.height * 0.5,
         y: this.height * 0.5,
@@ -88,10 +114,18 @@ window.addEventListener('load', function () {
     render(context) {
       this.player.draw(context);
       this.player.update();
+      this.obstacles.forEach(obstacle => obstacle.draw(context));
+    }
+    init() {
+      for (let i = 0; i < this.numberOfObstacles; i++) {
+        this.obstacles.push(new Obstacle(this));
+      }
     }
   }
 
   const game = new Game(canvas);
+  game.init();
+  console.log(game);
 
   function animate() {
     /**
