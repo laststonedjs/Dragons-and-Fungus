@@ -1,6 +1,7 @@
 window.addEventListener('load', function () {
   const canvas = document.getElementById('canvas1');
-  const ctx = canvas.getContext('2d'); // built-in object that holds all canvas properties and drawing methods
+  // built-in object that holds all canvas properties and drawing methods
+  const ctx = canvas.getContext('2d');
   canvas.width = 1280;
   canvas.height = 720;
 
@@ -18,7 +19,7 @@ window.addEventListener('load', function () {
       this.speedY = 0;
       this.dx = 0;
       this.dy = 0;
-      this.speedModifier = 20;
+      this.speedModifier = 5;
     }
     draw(context) {
       // to draw circle canvas
@@ -52,6 +53,19 @@ window.addEventListener('load', function () {
       }
       this.collisionX += this.speedX * this.speedModifier;
       this.collisionY += this.speedY * this.speedModifier;
+      // collisions with obstacles
+      this.game.obstacles.forEach(obstacle => {
+        // [(distance < sumOfRadii), distance, sumOfRadii, dx, dy];
+        let [collision, distance, sumOfRadii, dx, dy] = this.game.checkCollision(this, obstacle);
+        // let collision1 = game.checkCollision(this, obstacle)[0];
+        // let distance = game.checkCollision(this, obstacle)[1];
+        if (collision) {
+          const unit_x = dx / distance;
+          const unit_y = dy / distance;
+          this.collisionX = obstacle.collisionX + (sumOfRadii + 1) * unit_x;
+          this.collisionY = obstacle.collisionY + (sumOfRadii + 1) * unit_y;
+        }
+      })
     }
   }
 
@@ -124,9 +138,16 @@ window.addEventListener('load', function () {
       })
     }
     render(context) {
+      this.obstacles.forEach(obstacle => obstacle.draw(context));
       this.player.draw(context);
       this.player.update();
-      this.obstacles.forEach(obstacle => obstacle.draw(context));
+    }
+    checkCollision(a, b) {
+      const dx = a.collisionX - b.collisionX;
+      const dy = a.collisionY - b.collisionY;
+      const distance = Math.hypot(dy, dx);
+      const sumOfRadii = a.collisionRadius + b.collisionRadius;
+      return [(distance < sumOfRadii), distance, sumOfRadii, dx, dy];
     }
     init() {
       let attempts = 0;
@@ -138,8 +159,8 @@ window.addEventListener('load', function () {
           const dy = testObstacle.collisionY - obstacle.collisionY;
           const distance = Math.hypot(dy, dx);
           const distanceBuffer = 150;
-          const sumOfRadius = testObstacle.collisionRadius + obstacle.collisionRadius + distanceBuffer;
-          if (distance < sumOfRadius) {
+          const sumOfRadii = testObstacle.collisionRadius + obstacle.collisionRadius + distanceBuffer;
+          if (distance < sumOfRadii) {
             overlap = true;
           }
         });
